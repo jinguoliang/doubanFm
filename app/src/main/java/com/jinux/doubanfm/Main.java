@@ -71,7 +71,7 @@ public class Main extends Activity {
 
         //drawer list
         songList = (ListView) musiclist.findViewById(R.id.song_list);
-        songListAdapter = new SongListAdapter();
+        songListAdapter = new SongListAdapter(this);
         songList.setAdapter(songListAdapter);
         songList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -92,6 +92,7 @@ public class Main extends Activity {
 
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
+                Log.e(TAG,"onCompletion");
                 playSong(songListAdapter.getData().get(++mCurrentSongPosition));
             }
         });
@@ -101,6 +102,7 @@ public class Main extends Activity {
         Log.e(TAG,"The button is "+((Button)v).getText());
         switch (v.getId()){
             case R.id.play_pause:
+                mPlayer.togglePlay();
                 break;
             case R.id.next:
                 playSong(songListAdapter.getData().get(++mCurrentSongPosition));
@@ -228,66 +230,9 @@ public class Main extends Activity {
     }
 
 
-    private class SongListAdapter extends BaseAdapter {
-
-        private List<SongInfo> data= new ArrayList<SongInfo>();
-
-        public SongListAdapter() {
-
-        }
-
-        public List<SongInfo> getData() {
-            return data;
-        }
-
-        public void setData(List<SongInfo> songList){
-            data.clear();
-            data.addAll(songList);
-
-            notifyDataSetChanged();
-            notifyDataSetInvalidated();
-
-        }
-
-        @Override
-        public int getCount() {
-            return data.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return data.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            Log.e(TAG, "getView");
-
-            ViewHolder holder;
-            if (view == null){
-                view = getLayoutInflater().inflate(R.layout.song_list_item,null);
-                holder=new ViewHolder();
-                holder.title = (TextView) view.findViewById(R.id.title_item);
-                holder.artist = (TextView) view.findViewById(R.id.artist_item);
-                view.setTag(holder);
-            }else{
-                holder = (ViewHolder) view.getTag();
-            }
-
-            holder.title.setText(data.get(i).getTitle());
-            holder.artist.setText(data.get(i).getArtist());
-            return view;
-        }
-
-
-        private class ViewHolder {
-            TextView title;
-            TextView artist;
-        }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        mPlayer.release();
     }
 }

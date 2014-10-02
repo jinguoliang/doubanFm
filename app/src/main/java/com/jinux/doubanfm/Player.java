@@ -13,12 +13,16 @@ import java.io.IOException;
 public class Player {
 
     private static final String TAG = Player.class.getSimpleName();
-    MediaPlayer mp=new MediaPlayer();
+    MediaPlayer mp;
     Context mContext;
+
+    boolean isPaused=false;
+
     public Player(Context c){
         this.mContext=c;
-
+        mp=new MediaPlayer();
     }
+
     public void playSong(SongInfo songInfo,MediaPlayer.OnCompletionListener onComplete) {
         //if not
         //TODO
@@ -53,5 +57,21 @@ public class Player {
         });
         mp.setOnCompletionListener(onComplete);
 
+        isPaused = false;
+    }
+
+    public void togglePlay(){
+        if (isPaused){
+            mp.start();
+            isPaused=false;
+        }else {
+            mp.pause();
+            isPaused=true;
+        }
+    }
+
+    public void release(){
+        mp.stop();
+        mp.release();
     }
 }

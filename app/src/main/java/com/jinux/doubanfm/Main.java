@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -48,6 +50,7 @@ public class Main extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mDrawer = MenuDrawer.attach(this);
         mDrawer.setContentView(R.layout.main);
@@ -194,7 +197,7 @@ public class Main extends Activity {
             super.onPostExecute(jsonStr);
             if (jsonStr == null) return ;
 
-            chanel.setText(getResources().getString(R.string.chanel_fmt,mCurrentChanel));
+            chanel.setText(getResources().getString(R.string.chanel_fmt, mCurrentChanel));
             chanel.invalidate();
             List<SongInfo> list = Utils.getListFromJsonStr(jsonStr);
             songListAdapter.setData(list);

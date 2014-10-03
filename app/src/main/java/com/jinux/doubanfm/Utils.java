@@ -36,7 +36,7 @@ public class Utils {
             SongInfo info = null;
             JSONObject jo = (JSONObject) jsonParser.nextValue();
             JSONArray songList = jo.getJSONArray("song");
-             list = new ArrayList<SongInfo>(songList.length());
+             list = new ArrayList<SongInfo>(songList.length() - 1);
             for (int i = 0; i < songList.length(); i++) {
                 JSONObject o = songList.getJSONObject(i);
                 info = new SongInfo();
@@ -44,6 +44,8 @@ public class Utils {
                 info.setAlbum(o.getString("albumtitle"));
                 info.setArtist(o.getString("artist"));
                 info.setLength(o.getInt("length"));
+                if (info.getArtist().equals("沙宣"))
+                    continue;
                 try {
                     info.setPublicTime(o.getString("public_time"));
                 } catch (JSONException e) {
@@ -60,6 +62,7 @@ public class Utils {
             Log.e(TAG, "URL error");
             e.printStackTrace();
         }
+
         return list;
     }
 

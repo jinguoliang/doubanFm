@@ -133,20 +133,23 @@ public class Main extends Activity {
                 break;
             case R.id.chanel_pre:
                 mLoadChanelTask.cancel(true);
-                (mLoadChanelTask= new LoadChanelTask()).execute(--mCurrentChanel);
+                --mCurrentChanel;
+                (mLoadChanelTask= new LoadChanelTask()).execute(mCurrentChanel);
                 break;
             case R.id.chanel_next:
                 mLoadChanelTask.cancel(true);
-                (mLoadChanelTask= new LoadChanelTask()).execute(++mCurrentChanel);
+                ++mCurrentChanel;
+                (mLoadChanelTask= new LoadChanelTask()).execute(mCurrentChanel);
                 break;
         }
     }
 
 
     private String getChanel(int n) throws IOException {
-        URL url=new URL("http://douban.fm/j/mine/playlist?type=1&channel=1");
+        URL url=new URL("http://douban.fm/j/mine/playlist?channel="+n);
         HttpURLConnection con= (HttpURLConnection) url.openConnection();
         con.setConnectTimeout(5 * 1000);
+//        con.setRequestProperty("Cookie","ue=\"jinguol999@163.com\";"+"bid=\"NtvUtuVgQKs\";"+"dbcl2=\"65529182:ilpqQU1gRTg\";");
         con.setRequestMethod("GET");
         con.setRequestProperty("Charset","UTF-8");
 
@@ -167,7 +170,8 @@ public class Main extends Activity {
         }
         @Override
         protected String doInBackground(Integer... ints) {
-            Log.e(TAG,"start:");
+
+            Log.e(TAG,"start: chanel#"+ints[0]);
             String jsonString= null;
             try {
                 jsonString = getChanel(ints[0]);
@@ -189,11 +193,12 @@ public class Main extends Activity {
         protected void onPostExecute(String jsonStr) {
             super.onPostExecute(jsonStr);
             if (jsonStr == null) return ;
+
             chanel.setText(getResources().getString(R.string.chanel_fmt,mCurrentChanel));
-            Log.e(TAG, "the json is :\n" + jsonStr);
+            chanel.invalidate();
             List<SongInfo> list = Utils.getListFromJsonStr(jsonStr);
             songListAdapter.setData(list);
-            mCurrentChanel = 0;
+            mCurrentSongPosition = 0;
             playSong();
         }
     }

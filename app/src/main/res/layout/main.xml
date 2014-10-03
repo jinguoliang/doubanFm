@@ -19,10 +19,10 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="pre"
             android:id="@+id/chanel_pre"
             android:layout_alignParentLeft="true"
             android:layout_gravity="left"
+            android:background="@drawable/chanel_button_left"
             android:onClick="onButtonClick"/>
 
         <TextView
@@ -38,7 +38,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="next"
+            android:background="@drawable/chanel_button_right"
             android:id="@+id/chanel_next"
             android:layout_alignParentRight="true"
             android:layout_gravity="right"
@@ -80,6 +80,8 @@
             android:layout_height="wrap_content"
             android:text="pre"
             android:id="@+id/pre"
+            android:background="@drawable/contral_button"
+            android:layout_margin="5dp"
             android:onClick="onButtonClick"/>
 
         <Button
@@ -88,13 +90,18 @@
             android:text="Play"
             android:id="@+id/play_pause"
             android:onClick="onButtonClick"
-             />
+            android:layout_margin="5dp"
+            android:background="@drawable/contral_button"
+
+            />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="next"
             android:id="@+id/next"
+            android:layout_margin="5dp"
+            android:background="@drawable/contral_button"
             android:onClick="onButtonClick"/>
     </LinearLayout>
 

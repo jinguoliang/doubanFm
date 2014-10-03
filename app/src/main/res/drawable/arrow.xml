@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item >
+        <rotate android:fromDegrees="0" android:toDegrees="0"  android:drawable="@drawable/line">
+        </rotate>
+    </item>
+    <item android:left="2dp" android:right="10dp">
+        <rotate android:fromDegrees="30" android:toDegrees="30" android:pivotX="0" android:drawable="@drawable/line">
+        </rotate>
+    </item>
+    <item android:left="2dp" android:right="10dp">
+        <rotate android:fromDegrees="330" android:toDegrees="330" android:pivotX="0" android:drawable="@drawable/line">
+        </rotate>
+    </item>
+</layer-list>

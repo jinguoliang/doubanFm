@@ -42,7 +42,7 @@ public class Utils {
                 info = new SongInfo();
                 info.setTitle(o.getString("title"));
                 info.setAlbum(o.getString("albumtitle"));
-                info.setAlbum(o.getString("artist"));
+                info.setArtist(o.getString("artist"));
                 info.setLength(o.getInt("length"));
                 try {
                     info.setPublicTime(o.getString("public_time"));

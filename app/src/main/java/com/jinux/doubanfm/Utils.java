@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -61,8 +63,27 @@ public class Utils {
         return list;
     }
 
-    static void showToast(Context c, String s){
-        Toast.makeText(c,s,Toast.LENGTH_LONG).show();
+    static class ToastHandler extends Handler {
+        private final Context mContext;
+
+        public ToastHandler(Context c){
+            this.mContext = c;
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1:
+                    Toast.makeText(mContext,(String)msg.obj,Toast.LENGTH_LONG).show();
+                    break;
+            }
+
+        }
+    };
+    static void showToast(String s, ToastHandler th){
+        Message m = Message.obtain();
+        m.obj=s;
+        th.sendMessage(m);
     }
 
 
@@ -74,6 +95,7 @@ public class Utils {
         public LoadPictureTask(Context c, ImageView iv){
             this.mContext=c;
             this.mView=iv;
+
         }
         @Override
         protected Bitmap doInBackground(URL... urls) {
@@ -87,7 +109,7 @@ public class Utils {
                 bitmap = BitmapFactory.decodeStream(conn.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
-                Utils.showToast(mContext,"Failed to download picture");
+                Log.e(TAG,"load picture error");
             }
             Log.e(TAG, "load picture finish!!" + bitmap);
 

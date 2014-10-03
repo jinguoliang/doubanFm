@@ -5,6 +5,8 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +42,9 @@ public class Main extends Activity {
     private int mCurrentChanel = 1;
 
     private LoadChanelTask mLoadChanelTask ;
+
+    public Utils.ToastHandler toastHandler = new Utils.ToastHandler(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,15 +81,28 @@ public class Main extends Activity {
         songList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Main.this.mCurrentSongPosition = i;
-                playSong(songListAdapter.getData().get(i));
+                mCurrentSongPosition = i;
+                playSong();
             }
 
 
         });
     }
 
-    private void playSong(SongInfo songInfo) {
+    private void playSong() {
+        int position = mCurrentSongPosition;
+
+        List<SongInfo> list = songListAdapter.getData();
+        if (position >= list.size()){
+            position = position % list.size();
+        }
+        if (position < 0) {
+            position = list.size() - 1;
+            if(position < 0) return;
+        }
+        mCurrentSongPosition = position;
+
+        SongInfo songInfo = list.get(position);
         this.title.setText(songInfo.getTitle());
         //load picture
         new Utils.LoadPictureTask(Main.this,pictureView).execute(songInfo.getPicUrl());
@@ -93,7 +111,8 @@ public class Main extends Activity {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 Log.e(TAG,"onCompletion");
-                playSong(songListAdapter.getData().get(++mCurrentSongPosition));
+                ++mCurrentSongPosition;
+                playSong();
             }
         });
     }
@@ -105,10 +124,12 @@ public class Main extends Activity {
                 mPlayer.togglePlay();
                 break;
             case R.id.next:
-                playSong(songListAdapter.getData().get(++mCurrentSongPosition));
+                ++mCurrentSongPosition;
+                playSong();
                 break;
             case R.id.pre:
-                playSong(songListAdapter.getData().get(--mCurrentSongPosition));
+                --mCurrentSongPosition;
+                playSong();
                 break;
             case R.id.chanel_pre:
                 mLoadChanelTask.cancel(true);
@@ -153,7 +174,7 @@ public class Main extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(TAG,"err");
-                Utils.showToast(Main.this,"The network is not link");
+                Utils.showToast("The network is not link",toastHandler);
             }
             Log.e(TAG,"end");
             return jsonString;
@@ -172,7 +193,8 @@ public class Main extends Activity {
             Log.e(TAG, "the json is :\n" + jsonStr);
             List<SongInfo> list = Utils.getListFromJsonStr(jsonStr);
             songListAdapter.setData(list);
-            playSong(list.get(0));
+            mCurrentChanel = 0;
+            playSong();
         }
     }
 

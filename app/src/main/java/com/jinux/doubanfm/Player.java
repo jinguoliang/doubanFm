@@ -14,11 +14,11 @@ public class Player {
 
     private static final String TAG = Player.class.getSimpleName();
     MediaPlayer mp;
-    Context mContext;
+    Main mContext;
 
     boolean isPaused=false;
 
-    public Player(Context c){
+    public Player(Main c){
         this.mContext=c;
         mp=new MediaPlayer();
     }
@@ -38,7 +38,7 @@ public class Player {
             mp.setDataSource(songInfo.getSongUrl().toString());
         } catch (IOException e) {
             e.printStackTrace();
-            Utils.showToast(mContext,"MediaPlayer setDataSource URL error");
+            Utils.showToast("MediaPlayer setDataSource URL error",mContext.toastHandler);
         }
         mp.prepareAsync();
         mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {

@@ -1,8 +1,14 @@
 package com.jinux.doubanfm;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,10 +30,12 @@ import android.widget.TextView;
 import net.simonvt.menudrawer.MenuDrawer;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,11 +54,12 @@ public class Main extends Activity {
     private LoadChanelTask mLoadChanelTask ;
 
     public Utils.ToastHandler toastHandler = new Utils.ToastHandler(this);
+    private BroadcastReceiver mWifiConnectReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mDrawer = MenuDrawer.attach(this);
         mDrawer.setContentView(R.layout.main);
@@ -61,6 +70,28 @@ public class Main extends Activity {
 
         mPlayer = new Player(this);
         (mLoadChanelTask=new LoadChanelTask()).execute(mCurrentChanel);
+
+        regitsterWifiConnectListener();
+    }
+
+    private void regitsterWifiConnectListener() {
+        mWifiConnectReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.e(TAG,"wifi connection changed");
+                Bundle bundle = intent.getExtras();
+                NetworkInfo info = (NetworkInfo) bundle.get(WifiManager.EXTRA_NETWORK_INFO);
+                Log.e(TAG,"info:" + info.toString());
+                if(info.isConnected()){
+                    loadSongList(mCurrentChanel);
+                }else{
+                    mPlayer.stopPlay();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(mWifiConnectReceiver,filter);
     }
 
     private Button chanelPre,chanelNext,playAndPause,pre,next;
@@ -96,6 +127,10 @@ public class Main extends Activity {
         int position = mCurrentSongPosition;
 
         List<SongInfo> list = songListAdapter.getData();
+        if (list.size() == 0){
+            Utils.showToast("No Song",toastHandler);
+            return;
+        }
         if (position >= list.size()){
             position = position % list.size();
         }
@@ -135,16 +170,17 @@ public class Main extends Activity {
                 playSong();
                 break;
             case R.id.chanel_pre:
-                mLoadChanelTask.cancel(true);
-                --mCurrentChanel;
-                (mLoadChanelTask= new LoadChanelTask()).execute(mCurrentChanel);
+                loadSongList(--mCurrentChanel);
                 break;
             case R.id.chanel_next:
-                mLoadChanelTask.cancel(true);
-                ++mCurrentChanel;
-                (mLoadChanelTask= new LoadChanelTask()).execute(mCurrentChanel);
+                loadSongList(++mCurrentChanel);
                 break;
         }
+    }
+
+    private void loadSongList(int chanel) {
+        mLoadChanelTask.cancel(true);
+        (mLoadChanelTask= new LoadChanelTask()).execute(mCurrentChanel);
     }
 
 
@@ -264,5 +300,8 @@ public class Main extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 //        mPlayer.release();
+        if(mWifiConnectReceiver != null){
+            unregisterReceiver(mWifiConnectReceiver);
+        }
     }
 }

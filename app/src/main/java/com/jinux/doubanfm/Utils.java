@@ -85,6 +85,7 @@ public class Utils {
     };
     static void showToast(String s, ToastHandler th){
         Message m = Message.obtain();
+        m.what=1;
         m.obj=s;
         th.sendMessage(m);
     }

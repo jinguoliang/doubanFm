@@ -70,6 +70,10 @@ public class Player {
         }
     }
 
+    public void stopPlay(){
+        mp.pause();
+    }
+
     public void release(){
         mp.stop();
         mp.release();

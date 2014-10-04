@@ -65,7 +65,18 @@
             android:text="hello"
             android:textSize="20sp"
             android:id="@+id/song_title"
-            android:layout_gravity="center_horizontal|bottom"/>
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="10dp" />
+
+        <CheckBox
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:button="@drawable/heart"
+            android:text=""
+            android:onClick="onHeartClick"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp" />
         </FrameLayout>
 
 

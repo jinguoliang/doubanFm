@@ -23,11 +23,13 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import net.simonvt.menudrawer.MenuDrawer;
+import net.simonvt.menudrawer.Position;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -64,6 +66,7 @@ public class Main extends Activity {
         mDrawer = MenuDrawer.attach(this);
         mDrawer.setContentView(R.layout.main);
         mDrawer.setMenuView(R.layout.music_list);
+
         main=mDrawer.getContentContainer();
         musiclist=mDrawer.getMenuView();
         initView();
@@ -83,7 +86,7 @@ public class Main extends Activity {
                 NetworkInfo info = (NetworkInfo) bundle.get(WifiManager.EXTRA_NETWORK_INFO);
                 Log.e(TAG,"info:" + info.toString());
                 if(info.isConnected()){
-                    loadSongList(mCurrentChanel);
+                    continuePlay();
                 }else{
                     mPlayer.stopPlay();
                 }
@@ -92,6 +95,15 @@ public class Main extends Activity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         registerReceiver(mWifiConnectReceiver,filter);
+    }
+
+    private void continuePlay() {
+        if (songListAdapter.getData().size()==0){
+            loadSongList(mCurrentChanel);
+        }else{
+            playSong();
+        }
+
     }
 
     private Button chanelPre,chanelNext,playAndPause,pre,next;
@@ -202,6 +214,15 @@ public class Main extends Activity {
         return data;
     }
 
+    public void onHeartClick(View view) {
+        CheckBox checkBox = (CheckBox) view;
+        if (checkBox.isChecked()){
+
+        }else{
+
+        }
+    }
+
     class LoadChanelTask extends  AsyncTask<Integer, Integer ,String >{
 
         public LoadChanelTask(){
@@ -299,7 +320,7 @@ public class Main extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        mPlayer.release();
+        mPlayer.stopPlay();
         if(mWifiConnectReceiver != null){
             unregisterReceiver(mWifiConnectReceiver);
         }

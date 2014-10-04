@@ -217,7 +217,16 @@ public class Main extends Activity {
     public void onHeartClick(View view) {
         CheckBox checkBox = (CheckBox) view;
         if (checkBox.isChecked()){
-
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    SongInfo info = songListAdapter.getData().get(mCurrentSongPosition);
+                    SongDatabaseOpenHelper helper = new SongDatabaseOpenHelper(Main.this);
+                    helper.insertLikeSong(info);
+                    Utils.showToast("The song is added", toastHandler);
+                }
+            }.start();
         }else{
 
         }

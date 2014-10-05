@@ -266,7 +266,6 @@ public class Main extends Activity {
             if (jsonStr == null) return ;
 
             chanel.setText(getResources().getString(R.string.chanel_fmt, mCurrentChanel));
-            chanel.invalidate();
             List<SongInfo> list = Utils.getListFromJsonStr(jsonStr);
             songListAdapter.setData(list);
             mCurrentSongPosition = 0;

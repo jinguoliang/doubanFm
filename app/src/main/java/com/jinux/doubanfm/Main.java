@@ -11,17 +11,11 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -29,16 +23,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import net.simonvt.menudrawer.MenuDrawer;
-import net.simonvt.menudrawer.Position;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -58,6 +48,7 @@ public class Main extends Activity {
     public Utils.ToastHandler toastHandler = new Utils.ToastHandler(this);
     private BroadcastReceiver mWifiConnectReceiver;
     private SongDatabaseOpenHelper databaseOpenHelper;
+    private CheckBox likeIt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +113,7 @@ public class Main extends Activity {
         chanel = (TextView) main.findViewById(R.id.chanel);
         title = (TextView) main.findViewById(R.id.song_title);
         pictureView = (ImageView)main.findViewById(R.id.picture);
-
+        likeIt = (CheckBox)main.findViewById(R.id.like_it);
         //drawer list
         songList = (ListView) musiclist.findViewById(R.id.song_list);
         songListAdapter = new SongListAdapter(this);
@@ -156,9 +147,7 @@ public class Main extends Activity {
         mCurrentSongPosition = position;
 
         SongInfo songInfo = list.get(position);
-        this.title.setText(songInfo.getTitle());
-        //load picture
-        new Utils.LoadPictureTask(Main.this,pictureView).execute(songInfo.getPicUrl());
+        updateUi(songInfo);
         mPlayer.playSong(songInfo, new MediaPlayer.OnCompletionListener(){
 
             @Override
@@ -169,6 +158,17 @@ public class Main extends Activity {
             }
         });
     }
+
+    private void updateUi(SongInfo songInfo) {
+        //set title
+        this.title.setText(songInfo.getTitle());
+        //load picture
+        new Utils.LoadPictureTask(Main.this,pictureView).execute(songInfo.getPicUrl());
+        //set like it
+        SongInfo songLiked = databaseOpenHelper.getLikeSong(songInfo.getTitle(),songInfo.getArtist());
+        likeIt.setChecked(songLiked == null? false:true);
+    }
+
 
     public void onButtonClick(View v){
         Log.e(TAG,"The button is "+((Button)v).getText());

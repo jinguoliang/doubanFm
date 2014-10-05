@@ -69,6 +69,8 @@ public class SongDatabaseOpenHelper extends SQLiteOpenHelper {
     }
 
     public long insertLikeSong(SongInfo song){
+        if(getLikeSong(song.getTitle(),song.getArtist())!=null)
+            return 0;
         ContentValues values = new ContentValues();
         values.put(SongContract.LikeSongEntry.COLUMN_NAME_TITLE, song.getTitle());
         values.put(SongContract.LikeSongEntry.COLUMN_NAME_ALBUM, song.getAlbum());
@@ -89,10 +91,13 @@ public class SongDatabaseOpenHelper extends SQLiteOpenHelper {
     }
 
     public SongInfo getLikeSong(String title, String artist){
-        String selection = SongContract.LikeSongEntry.COLUMN_NAME_TITLE + " as ?" +
-                SongContract.LikeSongEntry.COLUMN_NAME_ARTIST + " as ?";
+        String selection = SongContract.LikeSongEntry.COLUMN_NAME_TITLE + " like ?" + " and " +
+                SongContract.LikeSongEntry.COLUMN_NAME_ARTIST + " like ?";
         String []args = new String []{title, artist};
         Cursor c = query(SongContract.LikeSongEntry.TABLE_NAME, selection,args, null);
+        if(c.getCount() == 0)
+            return null;
+
         c.moveToFirst();
         SongInfo song = new SongInfo();
         song.setTitle(title);
@@ -107,7 +112,7 @@ public class SongDatabaseOpenHelper extends SQLiteOpenHelper {
         }
         song.setRate(c.getInt(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_RATE)));
         song.setLength(c.getInt(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_LENTH)));
-        song.setLinkDate(new Date(c.getString(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_LIKE_DATE))));
+        song.setLinkDate(new Date(c.getLong(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_LIKE_DATE))));
         return song;
     }
 

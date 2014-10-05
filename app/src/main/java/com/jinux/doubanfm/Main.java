@@ -57,6 +57,7 @@ public class Main extends Activity {
 
     public Utils.ToastHandler toastHandler = new Utils.ToastHandler(this);
     private BroadcastReceiver mWifiConnectReceiver;
+    private SongDatabaseOpenHelper databaseOpenHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,8 @@ public class Main extends Activity {
         mDrawer = MenuDrawer.attach(this);
         mDrawer.setContentView(R.layout.main);
         mDrawer.setMenuView(R.layout.music_list);
+
+        databaseOpenHelper = new SongDatabaseOpenHelper(Main.this);
 
         main=mDrawer.getContentContainer();
         musiclist=mDrawer.getMenuView();
@@ -222,8 +225,7 @@ public class Main extends Activity {
                 public void run() {
                     super.run();
                     SongInfo info = songListAdapter.getData().get(mCurrentSongPosition);
-                    SongDatabaseOpenHelper helper = new SongDatabaseOpenHelper(Main.this);
-                    helper.insertLikeSong(info);
+                    databaseOpenHelper.insertLikeSong(info);
                     Utils.showToast("The song is added", toastHandler);
                 }
             }.start();
@@ -320,6 +322,7 @@ public class Main extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+
             return true;
         }
         return super.onOptionsItemSelected(item);

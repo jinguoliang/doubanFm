@@ -9,7 +9,9 @@ import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by jinux on 14-10-4.
@@ -85,9 +87,16 @@ public class SongDatabaseOpenHelper extends SQLiteOpenHelper {
         return insert(SongContract.LikeSongEntry.TABLE_NAME, values);
     }
 
-    public Cursor getLikeSongs(){
+    public List<SongInfo> getLikeSongs(){
         String sortOrder = SongContract.LikeSongEntry.COLUMN_NAME_LIKE_DATE + " DESC";
-        return query(SongContract.LikeSongEntry.TABLE_NAME, null, null, sortOrder);
+        Cursor c = query(SongContract.LikeSongEntry.TABLE_NAME, null, null, sortOrder);
+        List<SongInfo> list = new ArrayList<SongInfo>(c.getCount());
+        c.moveToFirst();
+        do {
+            SongInfo song = pushData2SongInfo(c);
+            list.add(song);
+        }while(c.moveToNext());
+        return  list;
     }
 
     public SongInfo getLikeSong(String title, String artist){
@@ -99,9 +108,14 @@ public class SongDatabaseOpenHelper extends SQLiteOpenHelper {
             return null;
 
         c.moveToFirst();
+
+        return pushData2SongInfo(c);
+    }
+
+    private SongInfo pushData2SongInfo(Cursor c){
         SongInfo song = new SongInfo();
-        song.setTitle(title);
-        song.setArtist(artist);
+        song.setTitle(c.getString(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_TITLE)));
+        song.setArtist(c.getString(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_ARTIST)));
         song.setAlbum(c.getString(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_ALBUM)));
         song.setPublicTime(c.getString(c.getColumnIndex(SongContract.LikeSongEntry.COLUMN_NAME_PUBLIC_TIME)));
         try {

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Main extends Activity {
@@ -49,6 +51,9 @@ public class Main extends Activity {
     private BroadcastReceiver mWifiConnectReceiver;
     private SongDatabaseOpenHelper databaseOpenHelper;
     private CheckBox likeIt;
+    private ListView likeList;
+    private SongListAdapter likeListAdapter;
+    private SongListAdapter mCurrentSongListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,7 @@ public class Main extends Activity {
 
         main=mDrawer.getContentContainer();
         musiclist=mDrawer.getMenuView();
+
         initView();
 
         mPlayer = new Player(this);
@@ -118,21 +124,28 @@ public class Main extends Activity {
         songList = (ListView) musiclist.findViewById(R.id.song_list);
         songListAdapter = new SongListAdapter(this);
         songList.setAdapter(songListAdapter);
-        songList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        likeList = (ListView) musiclist.findViewById(R.id.like_list);
+        likeListAdapter = new SongListAdapter(this);
+        likeList.setAdapter(likeListAdapter);
+        likeListAdapter.setData(databaseOpenHelper.getLikeSongs());
+
+        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mCurrentSongPosition = i;
+                mCurrentSongListAdapter = (SongListAdapter) adapterView.getAdapter();
                 playSong();
             }
+        };
+        songList.setOnItemClickListener(listener);
+        likeList.setOnItemClickListener(listener);
 
-
-        });
     }
 
     private void playSong() {
         int position = mCurrentSongPosition;
-
-        List<SongInfo> list = songListAdapter.getData();
+        SongListAdapter currentList = mCurrentSongListAdapter;
+        List<SongInfo> list = currentList.getData();
         if (list.size() == 0){
             Utils.showToast("No Song",toastHandler);
             return;
@@ -165,6 +178,7 @@ public class Main extends Activity {
         //load picture
         new Utils.LoadPictureTask(Main.this,pictureView).execute(songInfo.getPicUrl());
         //set like it
+        Log.e(TAG,songInfo.getTitle()+ ":" + songInfo.getArtist());
         SongInfo songLiked = databaseOpenHelper.getLikeSong(songInfo.getTitle(),songInfo.getArtist());
         likeIt.setChecked(songLiked == null? false:true);
     }
@@ -224,7 +238,13 @@ public class Main extends Activity {
                 @Override
                 public void run() {
                     super.run();
-                    SongInfo info = songListAdapter.getData().get(mCurrentSongPosition);
+
+                    List<SongInfo> data = songListAdapter.getData();
+                    if (data.size()==0) {
+                        Utils.showToast("No song to add", toastHandler);
+                        return;
+                    }
+                    SongInfo info = data.get(mCurrentSongPosition);
                     databaseOpenHelper.insertLikeSong(info);
                     Utils.showToast("The song is added", toastHandler);
                 }

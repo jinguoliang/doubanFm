@@ -91,7 +91,8 @@ public class SongDatabaseOpenHelper extends SQLiteOpenHelper {
         String sortOrder = SongContract.LikeSongEntry.COLUMN_NAME_LIKE_DATE + " DESC";
         Cursor c = query(SongContract.LikeSongEntry.TABLE_NAME, null, null, sortOrder);
         List<SongInfo> list = new ArrayList<SongInfo>(c.getCount());
-        c.moveToFirst();
+        if (!c.moveToFirst()) return null;
+
         do {
             SongInfo song = pushData2SongInfo(c);
             list.add(song);

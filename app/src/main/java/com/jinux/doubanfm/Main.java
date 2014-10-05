@@ -71,6 +71,8 @@ public class Main extends Activity {
 
         initView();
 
+        mCurrentSongListAdapter = songListAdapter;
+
         mPlayer = new Player(this);
         (mLoadChanelTask=new LoadChanelTask()).execute(mCurrentChanel);
 
@@ -289,6 +291,7 @@ public class Main extends Activity {
             List<SongInfo> list = Utils.getListFromJsonStr(jsonStr);
             songListAdapter.setData(list);
             mCurrentSongPosition = 0;
+            mCurrentSongListAdapter = songListAdapter;
             playSong();
         }
     }

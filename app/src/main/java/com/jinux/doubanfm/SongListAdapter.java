@@ -29,8 +29,11 @@ public class SongListAdapter extends BaseAdapter {
     }
 
     public void setData(List<SongInfo> songList){
+
         data.clear();
-        data.addAll(songList);
+
+        if (songList != null)
+            data.addAll(songList);
 
         notifyDataSetChanged();
         notifyDataSetInvalidated();
